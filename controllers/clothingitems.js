@@ -1,5 +1,5 @@
-const { get } = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
+const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/errors');
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -10,9 +10,9 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return res.status(BAD_REQUEST).send({ message: err.message });
       }
-      return res.status(500).send({ message: err.message });
+       return res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -21,7 +21,7 @@ const getItems = (req, res) => {
     .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(400).send({ message: err.message });
+      return res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -35,7 +35,7 @@ const likeItem = (req, res) => {
     .then((item) => res.status(200).send(item))
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res.status(BAD_REQUEST).send({ message: err.message });
     });
 };
 
@@ -49,7 +49,7 @@ const dislikeItem = (req, res) => {
     .then((item) => res.status(200).send(item))
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res.status(BAD_REQUEST).send({ message: err.message });
     });
 };
 
@@ -57,14 +57,11 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndDelete(itemId)
     .then((item) => {
-      if (!item) {
-        return res.status(404).send({ message: "Item not found!" });
-      }
       res.status(200).send({ message: "Item Deleted!", item });
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
