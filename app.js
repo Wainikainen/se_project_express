@@ -13,8 +13,18 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
+mongoose
+  .connect("mongodb://127.0.0.1:27017/wtwr_db")
+  .then(() => {
+    console.log("App connected to MongoDB");
+  })
+  .catch((error) => {
+    console.error("Error connecting to MongoDB");
+    console.error(error);
+  });
 
 app.use("/", indexRouter);
 
-app.listen(PORT, () => {});
+app.listen(PORT, () => {
+  console.log("Application running at:", `http://localhost:${PORT}`);
+});
