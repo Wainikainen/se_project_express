@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { PORT = 3001 } = process.env;
 const app = express();
 const indexRouter = require("./routes/index");
+const cors = require("cors");
 
 app.use((req, res, next) => {
   req.user = {
@@ -24,6 +25,9 @@ mongoose
   });
 
 app.use("/", indexRouter);
+
+
+app.use(cors());
 
 app.listen(PORT, () => {
   console.log("Application running at:", `http://localhost:${PORT}`);
