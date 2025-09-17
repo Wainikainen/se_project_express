@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const {JWT_SECRET} = require("../utils/config");
+const { JWT_SECRET } = require("../utils/config");
 const {
   BAD_REQUEST,
   NOT_FOUND,
   SERVER_ERROR,
   CONFLICT_ERROR,
-  UNAUTH_ERROR
+  UNAUTH_ERROR,
 } = require("../utils/errors");
 
 const createUser = (req, res) => {
@@ -21,7 +21,9 @@ const createUser = (req, res) => {
       .catch((err) => {
         console.error(err);
         if (err.code === 11000) {
-          return res.status(CONFLICT_ERROR).send({ message: "Email already exists" });
+          return res
+            .status(CONFLICT_ERROR)
+            .send({ message: "Email already exists" });
         }
         if (err.name === "ValidationError") {
           return res.status(BAD_REQUEST).send({ message: err.message });
@@ -36,24 +38,21 @@ const login = (req, res) => {
   User.findOne({ email })
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Incorrect email or password'));
+        return Promise.reject(new Error("Incorrect email or password"));
       }
       return bcrypt.compare(password, user.password);
     })
     .then((matched) => {
       if (!matched) {
-        return Promise.reject(new Error('Incorrect email or password'));
+        return Promise.reject(new Error("Incorrect email or password"));
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-         expiresIn: "7d"
+        expiresIn: "7d",
       });
-      res.status(200).send({token});
-
+      res.status(200).send({ token });
     })
     .catch((err) => {
-      res
-        .status(UNAUTH_ERROR)
-        .send({ message: err.message });
+      res.status(UNAUTH_ERROR).send({ message: err.message });
     });
 };
 
