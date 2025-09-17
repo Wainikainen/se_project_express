@@ -5,13 +5,6 @@ const app = express();
 const indexRouter = require("./routes/index");
 const cors = require("cors");
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "68c4d40991ded55217d9cf39",
-  };
-  next();
-});
-
 app.use(express.json());
 
 mongoose
