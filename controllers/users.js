@@ -76,25 +76,30 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateProfile = (req, res) => {
-  const { name, avatar } = req.body
-  if(!name && !avatar){
-      return res.status(BAD_REQUEST).send({ message: " No changes made to avatar or user!! " });
+  const { name, avatar } = req.body;
+  if (!name && !avatar) {
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: " No changes made to avatar or user!! " });
   }
-   const updatedData = {};
-    if(name) updatedData.name = name;
-    if(avatar) updatedData.avatar = avatar;
+  const updatedData = {};
+  if (name) updatedData.name = name;
+  if (avatar) updatedData.avatar = avatar;
 
-    User.findByIdAndUpdate(req.user._id, updatedData, { new: true, runValidators: true})
+  User.findByIdAndUpdate(req.user._id, updatedData, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
-        if(!user) {
-          return res.status(NOT_FOUND).send({message: "User not found!!"})
-        }
-        return res.status(200).send(user);
+      if (!user) {
+        return res.status(NOT_FOUND).send({ message: "User not found!!" });
+      }
+      return res.status(200).send(user);
     })
     .catch((err) => {
-       console.error(err);
-       return res.status(SERVER_ERROR).send({ message: err.message });
-    })
+      console.error(err);
+      return res.status(SERVER_ERROR).send({ message: err.message });
+    });
 };
 
 module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };

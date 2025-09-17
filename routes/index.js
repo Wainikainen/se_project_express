@@ -8,7 +8,6 @@ router.use("/items", clothingItemRouter);
 router.post("/signup", createUser);
 router.post("/login", login);
 
-
 router.use((req, res) => {
   res.status(404).send({
     message: "Requested resource not found",

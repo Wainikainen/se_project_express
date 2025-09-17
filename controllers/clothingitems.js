@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR, FORBIDDEN_ERROR } = require('../utils/errors');
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  FORBIDDEN_ERROR,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -12,7 +17,7 @@ const createItem = (req, res) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: err.message });
       }
-       return res.status(SERVER_ERROR).send({ message: err.message });
+      return res.status(SERVER_ERROR).send({ message: err.message });
     });
 };
 
@@ -57,14 +62,16 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndDelete(itemId)
     .then((item) => {
-      if(!item) {
-        return res.status(NOT_FOUND).send({ message: "Item not found!!!" })
+      if (!item) {
+        return res.status(NOT_FOUND).send({ message: "Item not found!!!" });
       }
 
-      if(!item.owner.equals(req.user._id)) {
-        return res.status(FORBIDDEN_ERROR).send({ message: "Only can delete your own items!" });
+      if (!item.owner.equals(req.user._id)) {
+        return res
+          .status(FORBIDDEN_ERROR)
+          .send({ message: "Only can delete your own items!" });
       }
-          res.status(200).send({ message: "Item Deleted!", item });
+      res.status(200).send({ message: "Item Deleted!", item });
     })
     .catch((err) => {
       console.error(err);
