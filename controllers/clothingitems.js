@@ -57,6 +57,10 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndDelete(itemId)
     .then((item) => {
+      if(!item) {
+        return res.status(NOT_FOUND).send({ message: "Item not found!!!" })
+      }
+
       if(!item.owner.equals(req.user._id)) {
         return res.status(FORBIDDEN_ERROR).send({ message: "Only can delete your own items!" });
       }
