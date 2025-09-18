@@ -54,13 +54,15 @@ const login = (req, res) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {expiresIn: "7d"} )
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
       res.status(200).send({ token });
     })
 
     .catch((err) => {
       console.log(err);
-      if (err.message === "Incorrect email or password") {
+      if (err.message === "Incorrect email or password!") {
         return res.status(UNAUTH_ERROR).send({ message: err.message });
       }
       return res.status(SERVER_ERROR).send({ message: "Server error" });
