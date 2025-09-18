@@ -11,4 +11,5 @@ module.exports = {
   SERVER_ERROR,
   CONFLICT_ERROR,
   UNAUTH_ERROR,
+  FORBIDDEN_ERROR
 };

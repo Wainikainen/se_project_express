@@ -19,7 +19,6 @@ mongoose
 
 app.use("/", indexRouter);
 
-
 app.use(cors());
 
 app.listen(PORT, () => {
