@@ -30,9 +30,6 @@ const getItems = (req, res) => {
     });
 };
 
-
-
-
 const likeItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndUpdate(
@@ -40,25 +37,20 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .then((item) =>{
-      if(!item) {
-        throw new Error( "Not found!"  )
+    .then((item) => {
+      if (!item) {
+        throw new Error("Not found!");
       }
-      res.status(200).send(item)
-
+      res.status(200).send(item);
     })
     .catch((err) => {
-      if(err.message === "Not found!" ) {
-       return res.status(NOT_FOUND).send({ message: "Not found!"  })
+      if (err.message === "Not found!") {
+        return res.status(NOT_FOUND).send({ message: "Not found!" });
       }
       console.error(err);
       return res.status(BAD_REQUEST).send({ message: err.message });
     });
 };
-
-
-
-
 
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
@@ -67,20 +59,18 @@ const dislikeItem = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .then((item) =>{
-      if(!item) {
-        throw new Error("Not found!")
+    .then((item) => {
+      if (!item) {
+        throw new Error("Not found!");
       }
-     res.status(200).send(item)
+      res.status(200).send(item);
     })
     .catch((err) => {
-      if(err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: err.message });
-
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: err.message });
       }
-      if(err.message === "Not found!"){
-      return res.status(NOT_FOUND).send({ message: err.message });
-
+      if (err.message === "Not found!") {
+        return res.status(NOT_FOUND).send({ message: err.message });
       }
       console.error(err);
       return res.status(SERVER_ERROR).send({ message: err.message });
@@ -103,8 +93,8 @@ const deleteItem = (req, res) => {
       res.status(200).send({ message: "Item Deleted!", item });
     })
     .catch((err) => {
-      if(err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: err.message });
       }
       console.error(err);
       return res.status(SERVER_ERROR).send({ message: err.message });
