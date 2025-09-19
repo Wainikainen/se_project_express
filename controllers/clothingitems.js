@@ -90,7 +90,7 @@ const deleteItem = (req, res) => {
           .status(FORBIDDEN_ERROR)
           .send({ message: "Only can delete your own items!" });
       }
-      res.status(200).send({ message: "Item Deleted!", item });
+       return res.status(200).send({ message: "Item Deleted!", item });
     })
     .catch((err) => {
       if (err.name === "CastError") {

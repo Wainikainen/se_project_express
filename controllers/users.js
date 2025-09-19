@@ -12,21 +12,24 @@ const {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  User.findOne({ email }).then((user) => {
+  if (!name || !avatar || !email || !password) {
+    return res.status(BAD_REQUEST).send({ message: "All fields are required" });
+  }
+  return User.findOne({ email }).then((user) => {
     if (user) {
       return res
         .status(CONFLICT_ERROR)
         .send({ message: " email already exists!! " });
     }
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) {
-        return res.status(SERVER_ERROR).send({ message: err.message });
+      return bcrypt.hash(password, 10, (error, hashedPassword) => {
+      if (error) {
+        return res.status(SERVER_ERROR).send({ message: error.message });
       }
 
-      User.create({ name, avatar, email, password: hashedPassword })
+      return User.create({ name, avatar, email, password: hashedPassword })
 
-        .then((user) => {
-          let userObj = user.toObject();
+        .then((createdUser) => {
+          const userObj = createdUser.toObject();
           delete userObj.password;
           res.status(201).send(userObj);
         })
@@ -52,7 +55,7 @@ const login = (req, res) => {
     return res.status(400).send({ message: "Enter both fields !!!" });
   }
 
-  User.findUserByCredentials(email, password)
+    return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -80,7 +83,7 @@ const getUsers = (req, res) => {
 
 const getCurrentUser = (req, res) => {
   const { _id } = req.user;
-  User.findById(_id)
+  return User.findById(_id)
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       console.error(err);
@@ -100,7 +103,7 @@ const updateProfile = (req, res) => {
   if (name) updatedData.name = name;
   if (avatar) updatedData.avatar = avatar;
 
-  User.findByIdAndUpdate(req.user._id, updatedData, {
+    return User.findByIdAndUpdate(req.user._id, updatedData, {
     new: true,
     runValidators: true,
   })
