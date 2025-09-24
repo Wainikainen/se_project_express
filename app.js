@@ -18,9 +18,10 @@ mongoose
     console.error(error);
   });
 
+app.use(cors());
+
 app.use("/", indexRouter);
 
-app.use(cors());
 
 app.listen(PORT, () => {
   console.log("Application running at:", `http://localhost:${PORT}`);
