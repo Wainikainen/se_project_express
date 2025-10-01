@@ -28,5 +28,6 @@ module.exports = {
         allow: ["_id"],
       },
     ],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
   },
 };
