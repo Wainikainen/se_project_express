@@ -1,36 +1,31 @@
 const ClothingItem = require("../models/clothingItem");
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  SERVER_ERROR,
-  FORBIDDEN_ERROR,
-} = require("../utils/errors");
+  BadRequest,
+  NotFound,
+  ServerError,
+  ForbiddenError,
+} = require("../middlewares/error");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       res.status(201).send(item);
     })
     .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
-      }
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      if (err.name === "ValidationError")
+        return next(new BadRequest(err.message));
+      return next(new ServerError(err.message));
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) => {
-      console.error(err);
-      return res.status(SERVER_ERROR).send({ message: err.message });
-    });
+    .catch((err) => next(new ServerError(err.message)));
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -38,21 +33,16 @@ const likeItem = (req, res) => {
     { new: true }
   )
     .then((item) => {
-      if (!item) {
-        throw new Error("Not found!");
-      }
+      if (!item) return next(new NotFound("Item not found"));
       res.status(200).send(item);
     })
     .catch((err) => {
-      if (err.message === "Not found!") {
-        return res.status(NOT_FOUND).send({ message: "Not found!" });
-      }
-      console.error(err);
-      return res.status(BAD_REQUEST).send({ message: err.message });
+      if (err.name === "CastError") return next(new BadRequest(err.message));
+      next(new ServerError(err.message));
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -60,44 +50,27 @@ const dislikeItem = (req, res) => {
     { new: true }
   )
     .then((item) => {
-      if (!item) {
-        throw new Error("Not found!");
-      }
+      if (!item) return next(new NotFound("Item not found"));
       res.status(200).send(item);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
-      }
-      if (err.message === "Not found!") {
-        return res.status(NOT_FOUND).send({ message: err.message });
-      }
-      console.error(err);
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      if (err.name === "CastError") return next(new BadRequest(err.message));
+      next(new ServerError(err.message));
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndDelete(itemId)
     .then((item) => {
-      if (!item) {
-        return res.status(NOT_FOUND).send({ message: "Item not found!!!" });
-      }
-
-      if (!item.owner.equals(req.user._id)) {
-        return res
-          .status(FORBIDDEN_ERROR)
-          .send({ message: "Only can delete your own items!" });
-      }
-       return res.status(200).send({ message: "Item Deleted!", item });
+      if (!item) return next(new NotFound("Item not found"));
+      if (!item.owner.equals(req.user._id))
+        return next(new ForbiddenError("Only can delete your own items!"));
+      res.status(200).send({ message: "Item Deleted!", item });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
-      }
-      console.error(err);
-      return res.status(SERVER_ERROR).send({ message: err.message });
+      if (err.name === "CastError") return next(new BadRequest(err.message));
+      next(new ServerError(err.message));
     });
 };
 

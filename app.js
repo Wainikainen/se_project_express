@@ -2,7 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const indexRouter = require("./routes/index");
-
+const { errorHandler } = require("./middlewares/error");
+const { errors: celebrateErrors } = require("celebrate");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -22,6 +23,9 @@ app.use(cors());
 
 app.use("/", indexRouter);
 
+app.use(celebrateErrors());
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log("Application running at:", `http://localhost:${PORT}`);
